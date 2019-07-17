@@ -1,0 +1,34 @@
+秒杀接口地址隐藏：秒杀开始之前，先去请求接口获取秒杀地址
+1.接口改造，带上PathVariable参数
+2.添加生成地址的接口
+3.秒杀收到请求，先验证PathVariable
+
+数学公式验证码：
+点击秒杀之前，先输入验证码，分散用户的请求
+1.添加生成验证码的接口
+2.在获取秒杀路径的时候，验证验证码
+3.ScriptEngine使用
+
+接口防刷：对接口做限流
+将用户的秒杀请求次数放入缓存中，设置5秒有效期
+5秒之内，用户对该接口的访问次数，使 缓存中的值加1 ，若超过限定次数，返回异常
+超过5秒后，该缓存值重新计数
+
+通用限流：
+1.用拦截器减少对业务的侵入
+拦截请求次数
+自定义限流注解
+自定义注解：@interface
+
+@Target({ElementType.METHOD,ElementType.FIELD,ElementType.ANNOTATION_TYPE,ElementType.CONSTRUCTOR,ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Constraint(validatedBy = {})
+
+@Target  该注解能被应用在哪些java元素上面
+@Retention 注解的生命周期
+    SOURCE 源文件
+    CLASS  被编译到class文件中，但java虚拟机会忽略它，运行期读取不到
+    RUNTIME 可以在运行期的加载阶段被加载到Class对象中。那么在程序运行阶段，我们可以通过反射得到这个注解，并通过判断是否有
+            这个注解或这个注解中属性的值，从而执行不同的程序代码段。我们实际开发中的自定义注解几乎都是使用的RetentionPolicy.RUNTIME；
+@Documented注解，是被用来指定自定义注解是否能随着被定义的java文件生成到JavaDoc文档当中。

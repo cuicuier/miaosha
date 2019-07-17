@@ -1,0 +1,145 @@
+CentOS安装RabbitMQ
+注意erlang和rabbitmq的版本
+1、在安装erlang之前先安装下依赖文件(这一步不要忘掉了， 不然后面./configure的时候要报错)：
+　　　　[root@iZwz9eailk2tci1wywk9p2Z local]# yum install gcc glibc-devel make ncurses-devel openssl-devel xmlto
+2、到erlang官网去下载erlang安装包
+　　　　官网地址：http://www.erlang.org/downloads
+　　　　作为一名强迫症患者，我当然是选择现在最新版本啦。右键复制连接地址，用wget进行下载
+　　　　[root@iZwz9eailk2tci1wywk9p2Z local]# wget -c http://erlang.org/download/otp_src_20.2.tar.gz
+
+　　　　接下来解压：
+　　　　　[root@iZwz9eailk2tci1wywk9p2Z local]# tar -zxvf otp_src_20.2.tar.gz
+　　　　　[root@iZwz9eailk2tci1wywk9p2Z local]# cd otp_src_20.2/
+3、编译安装( 我这里指定编译安装后放在/usr/local/erlang目录里面，这个你们可以改成其他的 )：
+　　　　[root@iZwz9eailk2tci1wywk9p2Z otp_src_20.2]# ./configure --prefix=/usr/local/erlang22
+　　　　[root@iZwz9eailk2tci1wywk9p2Z otp_src_20.2]# make && make install
+
+4、测试安装是否成功：
+　　　　　[root@iZwz9eailk2tci1wywk9p2Z erlang22]# cd /usr/local/erlang22/bin/
+　　　　　[root@iZwz9eailk2tci1wywk9p2Z bin]# ./erl
+            进入eshell界面
+            halt().   退出
+5、配置环境变量（ps:这个跟java的环境变量配置是差不多的）
+
+　　　　[root@iZwz9eailk2tci1wywk9p2Z local]# vim /etc/profile
+
+　　　　在末尾加入这么一行即可：export PATH=$PATH:/usr/local/erlang22/bin　
+
+　　　　更新配置文件：[root@iZwz9eailk2tci1wywk9p2Z local]# source /etc/profile
+
+　　　　更新之后在任意地方输入erl能进入命令行， 那么就说明配置成功了。
+安装rabbitmq
+1.
+安装python: yum install python -y
+安装simplejson: yum install xmlto -y
+    yum install python-simplejson -y
+二、安装rabbitmq
+
+　　1、到官网下载最新安装包：http://www.rabbitmq.com/releases/rabbitmq-server/
+
+　　　　[root@iZwz9eailk2tci1wywk9p2Z local]# wget -c http://www.rabbitmq.com/releases/rabbitmq-server/v3.6.15/rabbitmq-server-generic-unix-3.6.15.tar.xz
+
+　　　　解压：
+
+　　　　　　[root@iZwz9eailk2tci1wywk9p2Z local]# xz -d rabbitmq-server-generic-unix-3.6.15.tar.xz
+
+　　　　　　[root@iZwz9eailk2tci1wywk9p2Z local]# tar -xvf rabbitmq-server-generic-unix-3.6.15.tar
+
+　　2、配置rabbitmq的环境变量（这个跟上面的erlang配置以及java的环境变量差不多）
+
+　　　　[root@iZwz9eailk2tci1wywk9p2Z local]# vim /etc/profile
+
+　　　　在末尾加入以下配置：export PATH=$PATH:/usr/local/rabbitmq_server-3.6.15/sbin
+
+　　　　更新配置文件：[root@iZwz9eailk2tci1wywk9p2Z local]# source /etc/profile
+
+　　　　
+
+　　3、rabbitmq的基本操作：
+
+　　　　启动：rabbitmq-server -detached
+
+　　　　关闭：rabbitmqctl stop
+
+　　　　查看状态：rabbitmqctl status
+
+　　4、配置rabbitmq网页管理插件
+
+　　　　启用插件：root@iZwz9eailk2tci1wywk9p2Z local]# rabbitmq-plugins enable rabbitmq_management
+
+ 　　　   访问管理页面：http://192.168.?.?:15672  端口默认为15672
+
+　　　　　　
+
+　　　　默认来宾用户：guest， 来宾用户密码：guest
+
+　　5、开启rabbitmq远程访问
+
+　　　　在rabbitmq的安装目录下/etc/rabbitmq/下新建一个rabbitmq.config 文件，
+        [{rabbit, [{loopback_users, []}]}].
+        保存
+        重启rabbitmq服务器
+
+
+　　6、rabbitmq常用命令
+
+　　　　add_user        <UserName> <Password>
+
+　　　　delete_user    <UserName>
+
+　　　　change_password <UserName> <NewPassword>
+
+　　　　list_users
+
+　　　　add_vhost    <VHostPath>
+
+　　　　delete_vhost <VHostPath>
+
+　　　　list_vhostsset_permissions  [-p <VHostPath>] <UserName> <Regexp> <Regexp> <Regexp>
+
+　　　　clear_permissions [-p <VHostPath>] <UserName>
+
+　　　　list_permissions  [-p <VHostPath>]
+
+　　　　list_user_permissions <UserName>
+
+　　　　list_queues    [-p <VHostPath>] [<QueueInfoItem> ...]
+
+　　　　list_exchanges [-p <VHostPath>] [<ExchangeInfoItem> ...]
+
+　　　　list_bindings  [-p <VHostPath>]
+
+　　　　list_connections [<ConnectionInfoItem> ...]
+
+开机自启动：
+1.建立自启动脚本，添加内容
+    vim /usr/local/rabbitmq/sbin/start_rabbitmq.sh
+
+#!/bin/bash
+
+export PATH=$PATH:/usr/local/erlang20/bin
+export HOME=/usr/local/rabbitmq_server-3.6.15/
+/usr/local/rabbitmq_server-3.6.15/sbin/./rabbitmq-server -detached
+
+2.修改文件为可执行文件 chmod +x /usr/local/rabbitmq_server-3.6.15/sbin/start_rabbitmq.sh
+3.编辑/etc/rc.d/rc.local
+vim /etc/rc.d/rc.local
+
+#!/bin/bash
+# THIS FILE IS ADDED FOR COMPATIBILITY PURPOSES
+#
+# It is highly advisable to create own systemd services or udev rules
+# to run scripts during boot instead of using this file.
+#
+# In contrast to previous versions due to parallel execution during boot
+# this script will NOT be run after all other services.
+#
+# Please note that you must run 'chmod +x /etc/rc.d/rc.local' to ensure
+# that this script will be executed during boot.
+
+touch /var/lock/subsys/local
+#这里是要执行我们的启动脚本
+/usr/local/rabbitmq_server-3.6.15/sbin/start_rabbitmq.sh
+4.给rc.local增加可执行权限 chmod +x /etc/rc.d/rc.local
+shutdown -r now 重启系统
+   查看队列：chkconfig --list

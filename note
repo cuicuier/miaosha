@@ -1,0 +1,45 @@
+<script type="text/javascript" th:src="@{/jquery-validation/......}"></script>
+引入静态文件，其中@{/jquery-validation/lib/jquery-1.11.1.js} 的第一个"/" 代表static文件夹
+
+用户表：手机号作为id
+
+原数据库加密后的密码：b7797cce01b4b131b433b6acf4add449
+计算出的密码：6e0a7fe692684372437c9e508508990d
+
+自定义注解：
+@interface
+
+
+@Target({ElementType.METHOD,ElementType.FIELD,ElementType.ANNOTATION_TYPE,ElementType.CONSTRUCTOR,ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Constraint(validatedBy = {})
+
+@Target  该注解能被应用在哪些java元素上面
+@Retention 注解的生命周期
+    SOURCE 源文件
+    CLASS  被编译到class文件中，但java虚拟机会忽略它，运行期读取不到
+    RUNTIME 可以在运行期的加载阶段被加载到Class对象中。那么在程序运行阶段，我们可以通过反射得到这个注解，并通过判断是否有
+            这个注解或这个注解中属性的值，从而执行不同的程序代码段。我们实际开发中的自定义注解几乎都是使用的RetentionPolicy.RUNTIME；
+@Documented注解，是被用来指定自定义注解是否能随着被定义的java文件生成到JavaDoc文档当中。
+
+全局异常拦截器 GlobalExceptionHandler
+@ControllerAdvice
+@ResponseBody
+
+@ExceptionHandler(value = Exception.class)
+当业务逻辑代码抛出异常时，可以自动捕获，并返回相应的异常信息
+
+addArgumentResolvers  参数赋值
+
+秒杀功能：
+查看该订单是否已经秒杀过,不能重复秒杀
+若没有秒杀过：
+        /*
+        秒杀到了，执行以下操作（原子操作，在方法上加 @Transactional）
+        1.减库存
+        2.下订单（order_info表插入相应订单记录）
+        3.写入秒杀订单（miaosha_order表插入相应秒杀订单记录）
+         */
+
+

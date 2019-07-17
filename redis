@@ -1,0 +1,36 @@
+在CentOS终端中，下载redis的安装包，查看是否安装gcc
+wget http://download.redis.io/releases/redis-5.0.5.tar.gz
+
+把redis的安装包解压到 /usr/local下
+tar -zxvf redis-5.0.5.tar.gz -C /usr/local/
+
+先通过gcc -v是否有安装gcc，如果没有安装，执行命令sudo yum install -y gcc
+
+cd到redis的解压目录下
+cd /usr/local/redis-5.0.5/
+
+编译安装
+make MALLOC=libc
+
+将/usr/local/redis-5.0.5/src目录下的文件加到/usr/local/bin目录
+cd src && make install
+=====================================================================
+配置redis
+以后台进程方式启动：
+1.修改/usr/local/redis-4.0.9/redis.conf：    daemonize no   将值改为yes 保存退出
+2.指定redis.conf文件启动：                           
+./redis-server /usr/local/redis-4.0.6/redis.conf
+设置redis远程连接：
+1.因为redis默认设置允许本地连接，所以我们要将redis.conf中将bind 127.0.0.1 改为bind 0.0.0.0或者注释该行
+2.另外，阿里云ECS有一个安全组，找到并添加规则允许6379端口访问
+设置redis连接密码：
+在redis.conf中搜索requirepass这一行，然后在合适的位置添加配置
+requirepass yourpassword
+设置完成后执行/usr/local/bin/redis-server /usr/local/redis-4.0.6/redis.conf 更新配置
+此时，get就需要输入密码了
+
+设置开机自启动：
+在/etc目录下新建redis目录
+mkdir redis
+将/usr/local/redis-5.0.5/redis.conf 文件复制一份到/etc/redis-5.0.5目录下，并命名为6379.conf　　
+cp /usr/local/redis-5.0.5/redis.conf /etc/redis-5.0.5/6379.conf
